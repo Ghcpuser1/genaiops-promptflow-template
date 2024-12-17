@@ -83,9 +83,14 @@ def resolve_env_vars(base_path: str, logger: logging.Logger) -> Dict:
                     raise ValueError(
                         f"Reference {value} could not be resolved") from e
             else:
-                os.environ[key] = str(value)
-                env_vars[key] = str(value)
-                logger.info(f"Envvar {key} loaded.")
+                if (
+                    isinstance(value, str)
+                    and value.startswith('${')
+                    and value.endswith('}')
+                ):
+                    raise ValueError("values in env.yaml not resolved")
+                else:
+                    os.environ[key] = str(value)
     else:
         env_vars = {}
         logger.info("No env file found.")
