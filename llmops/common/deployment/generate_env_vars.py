@@ -29,13 +29,25 @@ output_list = []
 
 # Iterate over the top-level elements under 'init'
 for key, value in data.items():
+    key = str(key).strip()
+    value = str(value).strip()
+    if value.startswith('${') and value.endswith('}'):
+        value = value.replace('${', '').replace('}', '')
+        resolved_value = os.environ.get(value.upper(), None)
+        if resolved_value is None:
+            raise ValueError(
+                f"Environment variable {value.upper()} not found"
+            )
+    else:
+        resolved_value = value
+
     if is_env == 'true':
         output_list.append(
-            f'-e {key.upper()}={os.environ.get(key, None)}'
+            f'-e {key.upper()}={resolved_value}'
         )
     else:
         output_list.append(
-            f'{key.upper()}={os.environ.get(key, None)}'
+            f'{key.upper()}={resolved_value}'
         )
 
 # Join the output list with spaces

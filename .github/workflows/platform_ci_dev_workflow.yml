@@ -15,7 +15,7 @@ on:
         default: "web_classification"
       deployment_type:
         type: string
-        description: "Determine type of deployment - aml, aks, docker, webapp"
+        description: "Determine type of deployment - aml, aks, docker, webapp, none"
         required: true
     secrets:
       azure_credentials:
@@ -24,7 +24,7 @@ on:
       registry_details:
         description: "prompt flow registry details"
         required: false
-      env_vars:
+      ENV_VARS:
         description: "env vars for the flow"
         required: false
 
@@ -165,6 +165,7 @@ jobs:
   # Execute platform_cd_dev_workflow flow for deployment of flows
   #=====================================
   deploy-flow:
+    if: ${{ inputs.deployment_type != 'none' }}
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     needs: flow-experiment-and_evaluation
     with:
@@ -174,4 +175,4 @@ jobs:
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
       registry_details: ${{ secrets.registry_details }}
-      env_vars: ${{ secrets.env_vars }}
+      ENV_VARS: "${{ secrets.ENV_VARS }}"

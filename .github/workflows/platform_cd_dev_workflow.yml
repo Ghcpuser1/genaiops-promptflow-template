@@ -22,8 +22,8 @@ on:
       registry_details:
         description: "prompt flow registry details"
         required: false
-      env_vars:
-        description: "prompt flow registry details"
+      ENV_VARS:
+        description: "prompt flow environment variables details"
         required: false
   workflow_dispatch:
     inputs:
@@ -109,10 +109,10 @@ jobs:
           echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
 
       #=====================================
-      # Executes Kubernetes deployment when parameter deployment_type == 'aml'
-      # Reads 'kubernetes_endpoint' field values from deployment_config.json
+      # Executes managed deployment when parameter deployment_type == 'aml'
+      # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================             
-      - name: Deploy to Managed Kubernetes endpoint
+      - name: Deploy to Managed endpoint
         if: ${{ inputs.deployment_type == 'aml'  }}
         uses: ./.github/actions/aml_real_deployment
         with:
@@ -123,11 +123,11 @@ jobs:
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
           KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
-          ENV_VARS: ${{ secrets.env_vars }}
+          ENV_VARS: "${{ secrets.ENV_VARS }}"
 
       #=====================================
-      # Executes Managed deployment when parameter deployment_type == 'aks'
-      # Reads 'azure_managed_endpoint' field values from deployment_config.json
+      # Executes Managed kubernetes deployment when parameter deployment_type == 'aks'
+      # Reads 'kubernetes_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
         if: ${{ inputs.deployment_type == 'aks'  }}  
